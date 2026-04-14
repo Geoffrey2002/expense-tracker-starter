@@ -16,13 +16,25 @@ No test suite is configured.
 
 ## Architecture
 
-This is a single-page React app (Vite + React 19) with all logic in `src/App.jsx`. There is no backend — state is in-memory only (no persistence).
+Single-page React app (Vite + React 19). No backend — state is in-memory only (no persistence).
 
-**Known intentional issues (part of a course):**
-- Bug: `amount` is stored as a string, so `totalIncome` and `totalExpenses` use string concatenation instead of numeric addition. Fix: parse amount to float when creating a transaction or when reducing.
-- "Freelance Work" (id: 4) is typed as `"expense"` but categorized as `"salary"` — intentionally inconsistent seed data.
-- No delete functionality in the UI (`.delete-btn` CSS class exists but no button is rendered).
+### Component tree
 
-**Data model** — each transaction has: `id`, `description`, `amount` (string), `type` (`"income"` | `"expense"`), `category` (one of the `categories` array), `date` (ISO date string).
+```
+App
+├── Summary          — calculates and displays totalIncome, totalExpenses, balance
+├── TransactionForm  — owns form field state; calls onAdd(transaction) prop when submitted
+└── TransactionList  — owns filter state (filterType, filterCategory); renders the table
+```
 
-**Styling** is plain CSS in `src/App.css` and `src/index.css` (global resets). No CSS framework.
+`App` is the single source of truth for the `transactions` array. It passes the array down to all three children and provides `handleAdd` to `TransactionForm` via the `onAdd` prop.
+
+The `categories` constant is duplicated in `TransactionForm` and `TransactionList` — a candidate for extraction to a shared file if it ever changes.
+
+### Data model
+
+Each transaction: `id` (number), `description` (string), `amount` (number), `type` (`"income"` | `"expense"`), `category` (string), `date` (ISO date string `YYYY-MM-DD`).
+
+### Styling
+
+Plain CSS in `src/App.css` and `src/index.css` (global resets). No CSS framework. A `.delete-btn` class exists in `App.css` but no delete button is rendered yet.
